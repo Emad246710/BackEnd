@@ -1,7 +1,10 @@
 flask
 flask_sqlalchemy
 flask_marshmallow
+marshmallow-sqlalchemy
 python-dotenv
-uuid
 PyJWT
 werkzeug
+flask_cors
+flask-login 
+flask_principal 
