@@ -1,7 +1,8 @@
 flask
 flask_sqlalchemy
 flask_marshmallow
+marshmallow_sqlalchemy
 python-dotenv
 uuid
-PyJWT
 werkzeug
+flask-login 

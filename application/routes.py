@@ -1,87 +1,113 @@
-from flask import request, render_template, make_response, jsonify, abort, redirect, url_for, flash, session, g
+from flask import request, render_template, make_response, jsonify, abort
 from flask import current_app as app
-import sqlite3
+from flask_login import login_required, logout_user, current_user, login_user
+# from werkzeug.security import generate_password_hash, check_password_hash
+# import uuid
+from .models import User, UserSchema, sqlalc
 
 
-def get_db():
-    if not hasattr(g, "_database"):
-        print("create connection")
-        g._database = sqlite3.connect("database.db")
-    return g._database
 
 
-@app.teardown_appcontext
-def teardown_db(error):
-    """Closes the database at the end of the request."""
-    db = getattr(g, '_database', None)
-    if db is not None:
-        print("close connection")
-        db.close()
-
-def valid_login(username, password):
-    """Checks if username-password combination is valid."""
-    # user password data typically would be stored in a database
-    conn = get_db()
-
-    hash = get_hash_for_login(conn, username)
-    # the generate a password hash use the line below:
-    # generate_password_hash("rawPassword")
-    if hash != None:
-        return check_password_hash(hash, password)
-    return False
-
-
-@app.route("/login", methods=["POST"])
+@app.route('/login', methods=[ 'POST'])
 def login():
-    if not valid_login(request.form["username"], request.form["password"]):
-        abort(404)
-    conn = get_db()
-    user = get_user_by_name(conn,request.form["username"])
-    user["addresses"] = get_user_addresses(conn, user["userid"])
-    print(user)
-    session["userid"] = user["userid"]
-    return user
+    data = request.get_json()
 
-@app.route("/logout")
+    if  not (data['username'] and data['password']):
+        return {'errMsg':'Missing username or password! Please log in again.'}, 403
+
+    user = User.query.filter(User.username == data['username']).one_or_none()
+    if (user is None) or (user.password != data['password']):
+        return {'errMsg':'Invalid username or password! Please log in again.'}, 403
+
+    login_user(user)
+    return  {'Msg':'Logged in successfully!'}, 201 
+
+@app.route('/logout', methods=[ 'GET'])
+@login_required
 def logout():
-    session.pop("userid")
-    return redirect(url_for("index"))
-
-@app.route("/")
-def index():
-    return app.send_static_file("index.html")
+    """User log-out logic."""
+    logout_user()
+    return  {'Msg':'Logged out successfully!'}, 201 
 
 
 
-@app.route("/users", methods=["GET"])
-def users():
-    conn = get_db()
-    conn.row_factory = dict_factory
-    cur = conn.cursor()
-    users = cur.execute('SELECT * FROM users;').fetchall()
-
-   
-    return jsonify(users)
-
-
-
-
-def dict_factory(cursor, row):
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
-
-@app.route("/users", methods=["POST"])
-def add_user1():
-        conn = get_db()
-        (username,password ) = request.json
-        add_user(conn,"abudi1", generate_password_hash("Haaji123"))
-        return make_response(f"User added!", 201)
+@app.route('/', methods=['GET'])
+def home():
+    """Create a user via query string parameters."""
+    users = User.query.all()
+    print(users)
+    return {"data": [
+        {"username": u.username, "password": u.password, "notes":
+         [
+            {"id": n.id, "content": n.content, "createdOn": n.createdOn,
+                "priority": n.priority, "categoryId": n.categoryId}
+            for n in u.notes
+            ]
+         }
+        for u in users
+    ]}
 
 
+@app.route('/users', methods=['GET'])
+@login_required
+def user_all():
+    """
+    This function responds to a request for GET /api/users
+    with the complete lists of user
+    :return:        JSON string of list of user
+    """
+    users = User.query.all()
+    # Serialize the data for the response
+    user_schema = UserSchema(many=True)
+    # Serialize objects by passing them to your schema’s dump method, which returns the formatted result
+    data = user_schema.dump(users)
+    print('***********************************************************')
+    print(data)
+    print('***********************************************************')
+    return jsonify(data)
 
-if __name__ == "__main__":
-    app.run()
 
-    
+@app.route('/users/<id>', methods=['GET'])
+@login_required
+def user_one(id):
+    """
+    This function responds to a request for GET /api/users/{id}
+    with JUST one matching user
+    :param id:      id of the user to find
+    :return:        User matching id
+    """
+    # Build the initial query
+    user = User.query.filter(User.id == 1).one_or_none()
+    print(id)
+
+    if user is not None:
+        # Serialize the data for the response
+        user_schema = UserSchema()
+        # Serialize objects by passing them to your schema’s dump method, which returns the formatted result
+        data = user_schema.dump(user)
+        print('***********************************************************')
+        print(data)
+        print('***********************************************************')
+        return jsonify(data)
+    # Otherwise, nope, didn't find that user
+    else:
+        abort(404, f"User not found for id: {id}")
+
+
+@app.route('/register', methods=[ 'POST'])
+def signup_user():
+    data = request.get_json()
+
+    is_user_exists = (User.query.filter(User.username == data['username']).first()) is not None 
+    if is_user_exists:
+        return ({'msg:': f"User with username: {data['username']} is already registered!"}) , 409
+
+    user_schema = UserSchema()
+    new_user = user_schema.load(data, session=sqlalc.session)
+    # Add the user to the database
+    sqlalc.session.add(new_user)
+    sqlalc.session.commit()
+    # flask_login: login_user() is a method that comes from the flask_login package that does exactly what it says
+    login_user(user)  
+
+    return  {'Msg':'Registered successfully!'}, 201 
