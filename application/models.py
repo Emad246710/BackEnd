@@ -1,6 +1,7 @@
 #from marshmallow_sqlalchemy.schema.sqlalchemy_schema import auto_field
+from re import T
 from . import sqlalc ,ma
-import datetime
+from datetime import datetime, timezone
 from sqlalchemy.orm import relationship, backref  
 from marshmallow import fields  , EXCLUDE
 from flask_login import UserMixin
@@ -44,12 +45,12 @@ class Note(sqlalc.Model):
     createdOn = sqlalc.Column( 
          sqlalc.String(80), 
         #sqlalc.DateTime, 
-        default=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        default=datetime.now(timezone.utc).isoformat(),
         nullable=False  
         ) 
     priority = sqlalc.Column(
         sqlalc.Integer, 
-        nullable=False
+        nullable=True,
         )
     userId = sqlalc.Column(
         sqlalc.Integer, 
@@ -67,7 +68,7 @@ class Note(sqlalc.Model):
     categoryId = sqlalc.Column(
         sqlalc.Integer, 
         sqlalc.ForeignKey('Category.id'),    
-        nullable=False  
+        nullable=True  
         ) 
 
     category = relationship("Category", backref="notes")    # <----------One to many  we will call this feild 

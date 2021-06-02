@@ -17,12 +17,12 @@ CREATE TABLE Note (
   id INTEGER not null,
   content TEXT not null,
   createdOn TEXT not null,
-  priority INTEGER not null, --  1 <= priority <= 5
+  priority INTEGER , --  1 <= priority <= 5 or NULL
   userId INTEGER not null,-- Make it Nullable??
-  categoryId INTEGER not null, -- Nullable
+  categoryId INTEGER , -- Nullable
   foreign key (userId) references User(id) ON DELETE CASCADE,
   foreign key (categoryId) references Category(id) , -- ON DELETE Nothing
-  CHECK (priority >= 1 AND priority <=5) 
+  CHECK ((priority >= 1 AND priority <=5 ) OR priority is NULL) 
   primary key (id)
 );
 
@@ -61,17 +61,3 @@ PRAGMA foreign_keys = ON;
 SELECT *
 FROM User u, Note n 
 WHERE u.id=n.userId AND   u.id=1;
-
--- SELECT *
--- FROM author a
--- WHERE NOT EXISTS(
--- 		 SELECT *
--- 		 FROM book b
--- 		 WHERE NOT EXISTS(
--- 				  SELECT *
--- 				  FROM _BooksToAuthors bk_ar
--- 				  WHERE bk_ar.bookId=b.id AND bk_ar.authorId=a.id
--- 				  )
--- 		 )
--- ;
-

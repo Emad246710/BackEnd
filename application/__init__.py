@@ -36,8 +36,8 @@ def create_app():
     principals.init_app(app)
 
     # CORS(app )
-    CORS(app, supports_credentials=True, ) # defualt origins='*'
-    # CORS(app, origins='^http.*' , supports_credentials=True)
+    # CORS(app, supports_credentials=True, ) # defualt origins='*'
+    CORS(app, origins='^http.*' , supports_credentials=True)
     # CORS(app, origins='http://localhost:3000' , supports_credentials=True)
 
 

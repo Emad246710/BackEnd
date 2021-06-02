@@ -16,7 +16,7 @@ def login():
     req_fields = ["username", "password"]
     for key in req_fields:
         if not (key in data):
-            return {'errMsg':'Missing username or password! Please log in again.'}, 404
+            return {'errMsg':'Missing username or password! Please log in again.'}, 422
 
     user = User.query.filter(User.username == data['username']).one_or_none()
     if (user is None) or (user.password != data['password']):
@@ -27,7 +27,7 @@ def login():
 
 
 @app.route('/logout', methods=[ 'GET'])
-@login_required
+#@login_required
 def logout():
     """User log-out logic."""
     logout_user()
@@ -39,6 +39,7 @@ def logout():
 
 
 @app.route('/', methods=['GET'])
+#@login_required
 def home():
     """Create a user via query string parameters."""
     return "Project sdfsdfsdf  "
@@ -46,7 +47,7 @@ def home():
 #   -----------------------------      User    -----------------------------------
 
 @app.route('/users', methods=['GET'])
-@login_required
+#@login_required
 def user_all():
     """
     This function responds to a request for GET /users
@@ -65,7 +66,7 @@ def user_all():
     
 
 @app.route('/users/<id>', methods=['GET'])
-@login_required
+#@login_required
 def user_one(id):
     """
     This function responds to a request for GET /users/{id}
@@ -121,6 +122,7 @@ def signup_user():
 
 
 @app.route('/users/<id>', methods=[ 'PUT'])
+#@login_required
 def update_user(id):
 
     user_data = request.get_json()
@@ -134,7 +136,7 @@ def update_user(id):
 
     if (user_data['username'] is not None):
         username_exsist = User.query.filter(User.username == user_data['username'] ).first()
-        is_valid_username = ( username_exsist is None) or ( username_exsist.id == id )
+        is_valid_username = ( username_exsist is None) or ( username_exsist.id == int(id) )
         if not is_valid_username:
             return ({'errMsg:': f"User with usrename: {user_data['username']} is already registered!"}) , 409
 
@@ -160,7 +162,7 @@ def update_user(id):
 
 
 @app.route('/users/<id>', methods=[ 'DELETE'])
-@login_required
+#@login_required
 def delete_user(id):
     # Get the user requested
     user = User.query.filter(User.id == id).first()
@@ -185,7 +187,7 @@ def delete_user(id):
 
 
 @app.route('/notes', methods=['GET'])
-@login_required
+#@login_required
 def notes_all():
     notes = Note.query.all()
     #    Serialize the data for the response
@@ -203,6 +205,7 @@ def notes_all():
 
 
 @app.route('/notes', methods=[ 'POST'])
+#@login_required
 def create_note():
     note_data = request.get_json()
 
@@ -229,6 +232,7 @@ def create_note():
     ###update_note
 
 @app.route('/notes/<id>', methods=[ 'PUT'])
+#@login_required
 def update_note(id):
     note_data = request.get_json()
  # There is no need to check if the args revcd in the "request.get_json()" has the same structure as "model".
@@ -257,7 +261,7 @@ def update_note(id):
 
 
 @app.route('/notes/<id>', methods=['GET'])
-@login_required
+#@login_required
 def note_one(id):
    
     # Build the initial query
@@ -281,6 +285,7 @@ def note_one(id):
 #### delete note
 
 @app.route('/notes/<id>', methods=[ 'DELETE'])
+#@login_required
 def delete_note(id):
     # Get the note requested
     note = Note.query.filter(Note.id == id).first()
@@ -307,7 +312,7 @@ def delete_note(id):
 
 
 @app.route('/categories', methods=['GET'])
-@login_required
+#@login_required
 def categories_all():
     categories = Category.query.all()
     #    Serialize the data for the response
@@ -324,6 +329,7 @@ def categories_all():
 ### create_category
 
 @app.route('/categories', methods=[ 'POST'])
+#@login_required
 def create_category():
     category_data = request.get_json()
 
@@ -353,7 +359,7 @@ def create_category():
 
 
 @app.route('/categories/<id>', methods=['GET'])
-@login_required
+#@login_required
 def category_one(id):
    
     # Build the initial query
@@ -379,6 +385,7 @@ def category_one(id):
 ### update_category
 
 @app.route('/categories/<id>', methods=[ 'PUT'])
+#@login_required
 def update_category(id):
     category_data = request.get_json()
  # There is no need to check if the args revcd in the "request.get_json()" has the same structure as "model".
@@ -412,6 +419,7 @@ def update_category(id):
 ### delete_category
 
 @app.route('/categories/<id>', methods=[ 'DELETE'])
+#@login_required
 def delete_category(id):
     # Get the category requested
     category = Category.query.filter(Category.id == id).first()
