@@ -69,8 +69,6 @@ def create_app():
                 else:
                     identity.provides.add(RoleNeed('not_admin'))
 
-        # Register Blueprints
-        # app.register_blueprint(auth.auth_bp)
-        # app.register_blueprint(admin.admin_bp)
+        
 
         return app
