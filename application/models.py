@@ -56,8 +56,8 @@ class Note(sqlalc.Model):
         sqlalc.ForeignKey('User.id'),    
         nullable=False # make it nullable ???
         ) 
-    user = relationship("User",backref="notes" , cascade="all, delete")             # <----------One to many  we will call this feild  
-   
+    user = relationship("User",backref= backref("notes", cascade="all,delete"))  
+    
     categoryId = sqlalc.Column(
         sqlalc.Integer, 
         sqlalc.ForeignKey('Category.id'),    
@@ -86,7 +86,7 @@ class Category(sqlalc.Model):
         sqlalc.ForeignKey('User.id'),    
         nullable=True # make it nullable ???
         ) 
-    user = relationship("User",backref="categories", cascade="all, delete")             # <----------One to many  we will call this feild  
+    user = relationship("User",backref= backref("categories", cascade="all,delete"))  
 
     def __repr__(self):
         return '<Category id: {arg1},  tp: {arg2} ,  userId: {arg3} >'.format(arg1=self.id , arg2=self.type , arg3=self.userId)
@@ -118,7 +118,7 @@ class NoteSchema(ma.SQLAlchemyAutoSchema):
         unknown = EXCLUDE
 
         include_fk = True # IMPORTANT to enable this, in orde to Post Note with field userId and categoryId "necessary in usecase where Note can have these FK as null"
-    category = fields.Nested('CategorySchema',  many=False,  only=["type"])
+    # category = fields.Nested('CategorySchema',  many=False,  only=["type"])
 
 
 class CategorySchema(ma.SQLAlchemyAutoSchema):

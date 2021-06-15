@@ -28,13 +28,13 @@ CREATE TABLE Note (
   primary key (id)
 );
 
-
+-- plain password are ps123456,, generate by     werkzeug.security.generate_password_hash("ps123456", "sha256")
 insert into User values
-(1, 'user1' , 'ps1'),
-(2, 'user2', 'ps2'),
-(3, 'user3', 'ps3'),
-(4, 'user4', 'ps4'),
-(5, 'user5', 'ps5');
+(1, 'user1', 'sha256$kZ5Jc4wGXUOI4JsO$1c66f3e19c460f011575e2bfc7551ccff19fb718543aedad5462740be0ec9a5f'),
+(2, 'user2', 'sha256$kZ5Jc4wGXUOI4JsO$1c66f3e19c460f011575e2bfc7551ccff19fb718543aedad5462740be0ec9a5f'),
+(3, 'user3', 'sha256$kZ5Jc4wGXUOI4JsO$1c66f3e19c460f011575e2bfc7551ccff19fb718543aedad5462740be0ec9a5f'),
+(4, 'user4', 'sha256$kZ5Jc4wGXUOI4JsO$1c66f3e19c460f011575e2bfc7551ccff19fb718543aedad5462740be0ec9a5f'),
+(5, 'user5', 'sha256$kZ5Jc4wGXUOI4JsO$1c66f3e19c460f011575e2bfc7551ccff19fb718543aedad5462740be0ec9a5f');
 
 insert into Category values
 (1 ,  "type1" , 1),

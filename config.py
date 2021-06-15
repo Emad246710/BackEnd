@@ -13,9 +13,7 @@ print('--------SECRET_KEY--------')
 
 class Config:
     """Base config."""
-    # SECRET_KEY = os.getenv('SECRET_KEY') # In case the key is stored in our os for ex windows' system-env
     SECRET_KEY = environ.get('SECRET_KEY') # In our case the key is stored in our ./.env file 
-    # SESSION_COOKIE_NAME = environ.get('SESSION_COOKIE_NAME')
     FLASK_ENV = 'development'
     DEBUG = True
     TESTING = True

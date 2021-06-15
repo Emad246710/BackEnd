@@ -48,26 +48,6 @@ def create_app():
         from . import routes
         # from . import auth
 
-        # flask_principal
-        @identity_loaded.connect_via(app)
-        def on_identity_loaded(sender, identity):
-            # Set the identity user object
-            identity.user = current_user
-            # Add the UserNeed to the identity
-            if hasattr(current_user, 'id'):
-                identity.provides.add(UserNeed(current_user.id))
-
-            print('********************************************************************')
-            print('******identity_loaded.connect_via*************')
-            print('********************************************************************')
-
-            # Just for testing we will give user with "id=1", admin role
-            # But the user table in the db should have a "role" column and depending on the value of that column we can set the "RoleNeed" value 
-            if hasattr(current_user, 'id'): # This to ensure that the user is not instance of AnonymousUserMixin, which is the case if the user didn't logged in OR after logout
-                if current_user.id == 1:
-                    identity.provides.add(RoleNeed('yeh!_admin'))
-                else:
-                    identity.provides.add(RoleNeed('not_admin'))
 
         
 
